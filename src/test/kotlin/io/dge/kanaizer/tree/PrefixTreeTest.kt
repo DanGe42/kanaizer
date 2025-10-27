@@ -1,5 +1,10 @@
-import KanaFlag.ADD_DOUBLE_CONSONANT
-import KanaFlag.ADD_LONG_VOWEL
+package io.dge.kanaizer.tree
+
+import io.dge.kanaizer.translator.Translator
+import io.dge.kanaizer.tree.HIRAGANA_MAPPINGS
+import io.dge.kanaizer.tree.KanaFlag
+import io.dge.kanaizer.tree.KanaTreeBuilder
+import io.dge.kanaizer.tree.PrefixTree
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertContains
@@ -108,13 +113,13 @@ class PrefixTreeTest {
     @Test
     fun `doubled consonants`() {
         val tree = KanaTreeBuilder(sokuon = "っ").apply {
-            put("cho", "ちょ", ADD_DOUBLE_CONSONANT)
+            put("cho", "ちょ", KanaFlag.ADD_DOUBLE_CONSONANT)
             put("da", "だ")
             put("i", "い")
             put("i", "い")
-            put("ki", "き", ADD_DOUBLE_CONSONANT)
-            put("ku", "く", ADD_DOUBLE_CONSONANT)
-            put("kyo", "きょ", ADD_DOUBLE_CONSONANT)
+            put("ki", "き", KanaFlag.ADD_DOUBLE_CONSONANT)
+            put("ku", "く", KanaFlag.ADD_DOUBLE_CONSONANT)
+            put("kyo", "きょ", KanaFlag.ADD_DOUBLE_CONSONANT)
             put("ma", "ま")
             put("me", "め")
             put("n", "ん")
@@ -122,13 +127,13 @@ class PrefixTreeTest {
             put("ni", "に")
             put("no", "の")
             put("ra", "ら")
-            put("sa", "さ", ADD_DOUBLE_CONSONANT)
-            put("sha", "しゃ", ADD_DOUBLE_CONSONANT)
-            put("shi", "し", ADD_DOUBLE_CONSONANT)
+            put("sa", "さ", KanaFlag.ADD_DOUBLE_CONSONANT)
+            put("sha", "しゃ", KanaFlag.ADD_DOUBLE_CONSONANT)
+            put("shi", "し", KanaFlag.ADD_DOUBLE_CONSONANT)
             put("su", "す")
-            put("ta", "た", ADD_DOUBLE_CONSONANT)
-            put("te", "て", ADD_DOUBLE_CONSONANT)
-            put("to", "と", ADD_DOUBLE_CONSONANT)
+            put("ta", "た", KanaFlag.ADD_DOUBLE_CONSONANT)
+            put("te", "て", KanaFlag.ADD_DOUBLE_CONSONANT)
+            put("to", "と", KanaFlag.ADD_DOUBLE_CONSONANT)
             put("ya", "や")
         }.build()
 
@@ -148,21 +153,21 @@ class PrefixTreeTest {
     fun `katakana with long vowels`() {
         val translator = Translator(
             KanaTreeBuilder(sokuon = "ッ", choonpu = "ー").apply {
-                put("de", "デ", ADD_LONG_VOWEL)
-                put("fu", "フ", ADD_LONG_VOWEL)
-                put("i", "イ", ADD_LONG_VOWEL)
-                put("ka", "カ", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
-                put("ke", "ケ", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
-                put("ma", "マ", ADD_LONG_VOWEL)
-                put("na", "ナ", ADD_LONG_VOWEL)
-                put("pa", "パ", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
-                put("ra", "ラ", ADD_LONG_VOWEL)
-                put("re", "レ", ADD_LONG_VOWEL)
-                put("ri", "リ", ADD_LONG_VOWEL)
-                put("sa", "サ", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
-                put("su", "ス", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
-                put("to", "ト", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
-                put("za", "ザ", ADD_LONG_VOWEL)
+                put("de", "デ", KanaFlag.ADD_LONG_VOWEL)
+                put("fu", "フ", KanaFlag.ADD_LONG_VOWEL)
+                put("i", "イ", KanaFlag.ADD_LONG_VOWEL)
+                put("ka", "カ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+                put("ke", "ケ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+                put("ma", "マ", KanaFlag.ADD_LONG_VOWEL)
+                put("na", "ナ", KanaFlag.ADD_LONG_VOWEL)
+                put("pa", "パ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+                put("ra", "ラ", KanaFlag.ADD_LONG_VOWEL)
+                put("re", "レ", KanaFlag.ADD_LONG_VOWEL)
+                put("ri", "リ", KanaFlag.ADD_LONG_VOWEL)
+                put("sa", "サ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+                put("su", "ス", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+                put("to", "ト", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+                put("za", "ザ", KanaFlag.ADD_LONG_VOWEL)
                 put("n", "ン")
             }.build()
         )

@@ -1,3 +1,6 @@
+package io.dge.kanaizer.translator
+
+import io.dge.kanaizer.tree.PrefixTree
 import kotlin.math.min
 
 class Translator(

@@ -1,3 +1,5 @@
+package io.dge.kanaizer.tree
+
 open class PrefixTree private constructor(private val root: PrefixNode) {
     companion object {
         fun builder(): Builder = Builder()

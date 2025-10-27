@@ -1,3 +1,5 @@
+package io.dge.kanaizer.tree
+
 enum class KanaFlag {
     ADD_DOUBLE_CONSONANT,
     ADD_LONG_VOWEL,

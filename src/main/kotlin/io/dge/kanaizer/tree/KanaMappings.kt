@@ -1,4 +1,6 @@
-import KanaFlag.*
+package io.dge.kanaizer.tree
+
+import io.dge.kanaizer.tree.KanaFlag.*
 
 
 val HIRAGANA_MAPPINGS: PrefixTree = KanaTreeBuilder(sokuon = "っ").apply {
