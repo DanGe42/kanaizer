@@ -94,7 +94,7 @@ val HIRAGANA_MAPPINGS: PrefixTree = KanaTreeBuilder(sokuon = "っ").apply {
     put("bya", "びゃ")
     put("byu", "びゅ")
     put("byo", "びょ")
-    putDoubled("po", "ぱ")
+    putDoubled("pa", "ぱ")
     putDoubled("pi", "ぴ")
     putDoubled("pu", "ぷ")
     putDoubled("pe", "ぺ")

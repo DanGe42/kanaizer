@@ -32,7 +32,7 @@ class PrefixTreeTest {
         val ex: IllegalArgumentException = assertThrows<IllegalArgumentException> {
             Translator(tree).translate("aeibadtext")
         }
-        assertEquals(ex.message, "provided text is invalid. Next 4 remaining characters: badt")
+        assertEquals(ex.message, "Invalid token at start=3 end=3. Input[start..end+4] = \"badt\"")
     }
 
     @Test
@@ -100,32 +100,55 @@ class PrefixTreeTest {
     fun `doubled consonants`() {
         val tree = KanaTreeBuilder(sokuon = "っ").apply {
             putDoubled("cho", "ちょ")
-            putDoubled("to", "と")
-            put("ma", "ま")
-            putDoubled("te", "て")
-            putDoubled("ku", "く")
             put("da", "だ")
-            putDoubled("sa", "さ")
             put("i", "い")
-            put("ya", "や")
-            putDoubled("kyo", "きょ")
-            put("ni", "に")
             put("i", "い")
             putDoubled("ki", "き")
-            put("su", "す")
-            put("ne", "ね")
-            put("no", "の")
-            putDoubled("ta", "た")
+            putDoubled("ku", "く")
+            putDoubled("kyo", "きょ")
+            put("ma", "ま")
             put("me", "め")
             put("n", "ん")
+            put("ne", "ね")
+            put("ni", "に")
+            put("no", "の")
+            put("ra", "ら")
+            putDoubled("sa", "さ")
+            putDoubled("sha", "しゃ")
+            putDoubled("shi", "し")
+            put("su", "す")
+            putDoubled("ta", "た")
+            putDoubled("te", "て")
+            putDoubled("to", "と")
+            put("ya", "や")
         }.build()
 
         mapOf(
             "chottomattekudasai" to "ちょっとまってください",
             "yakkyokuniittekimasu" to "やっきょくにいってきます",
             "nennotame" to "ねんのため",
+            "irasshaimashita" to "いらっしゃいました",
         ).forEach { (text, expected) ->
             val actual = Translator(tree).translate(text)
+            val message = "translate(\"$text\") -> \"$actual\", but it should be \"$expected\""
+            assertEquals(expected, actual, message)
+        }
+    }
+
+    // -- These tests use the full hiragana mappings -- //
+
+    @Test
+    fun `hiragana translations with punctuation and disambiguation`() {
+        val translator = Translator(HIRAGANA_MAPPINGS)
+        mapOf(
+            "pan'ya ni ikimasu." to "ぱんや に いきます.",
+            "panya ni ikimasu." to "ぱにゃ に いきます.",
+            "nishukanimasu." to "にしゅかにます.",
+            "nishukan'imasu." to "にしゅかんいます.",
+            "nan nichi nihon ni imasu ka?" to "なん にち にほん に います か?",
+            "sumimasen.  kyoto eki made ichi mai, onegai shimasu。" to "すみません.  きょと えき まで いち まい, おねがい します。"
+        ).forEach { (text, expected) ->
+            val actual = translator.translate(text)
             val message = "translate(\"$text\") -> \"$actual\", but it should be \"$expected\""
             assertEquals(expected, actual, message)
         }
