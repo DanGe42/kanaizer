@@ -1,4 +1,5 @@
 import KanaFlag.ADD_DOUBLE_CONSONANT
+import KanaFlag.ADD_LONG_VOWEL
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertContains
@@ -138,6 +139,42 @@ class PrefixTreeTest {
             "irasshaimashita" to "いらっしゃいました",
         ).forEach { (text, expected) ->
             val actual = Translator(tree).translate(text)
+            val message = "translate(\"$text\") -> \"$actual\", but it should be \"$expected\""
+            assertEquals(expected, actual, message)
+        }
+    }
+
+    @Test
+    fun `katakana with long vowels`() {
+        val translator = Translator(
+            KanaTreeBuilder(sokuon = "ッ", choonpu = "ー").apply {
+                put("de", "デ", ADD_LONG_VOWEL)
+                put("fu", "フ", ADD_LONG_VOWEL)
+                put("i", "イ", ADD_LONG_VOWEL)
+                put("ka", "カ", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
+                put("ke", "ケ", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
+                put("ma", "マ", ADD_LONG_VOWEL)
+                put("na", "ナ", ADD_LONG_VOWEL)
+                put("pa", "パ", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
+                put("ra", "ラ", ADD_LONG_VOWEL)
+                put("re", "レ", ADD_LONG_VOWEL)
+                put("ri", "リ", ADD_LONG_VOWEL)
+                put("sa", "サ", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
+                put("su", "ス", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
+                put("to", "ト", ADD_DOUBLE_CONSONANT, ADD_LONG_VOWEL)
+                put("za", "ザ", ADD_LONG_VOWEL)
+                put("n", "ン")
+            }.build()
+        )
+
+        mapOf(
+            "karee" to "カレー",
+            "dezainaa" to "デザイナー",
+            "furiiransu" to "フリーランス",
+            "suupaamaaketto" to "スーパーマーケット",
+            "sakkaa" to "サッカー",
+        ).forEach { (text, expected) ->
+            val actual = translator.translate(text)
             val message = "translate(\"$text\") -> \"$actual\", but it should be \"$expected\""
             assertEquals(expected, actual, message)
         }

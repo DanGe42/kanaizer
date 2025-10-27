@@ -1,8 +1,9 @@
 enum class KanaFlag {
     ADD_DOUBLE_CONSONANT,
+    ADD_LONG_VOWEL,
 }
 
-class KanaTreeBuilder(val sokuon: String) : PrefixTree.BuilderBase<KanaTreeBuilder>() {
+class KanaTreeBuilder(val sokuon: String, val choonpu: String? = null) : PrefixTree.BuilderBase<KanaTreeBuilder>() {
     override fun self(): KanaTreeBuilder = this
 
     fun put(sequence: String, element: String, vararg flags: KanaFlag): KanaTreeBuilder {
@@ -13,6 +14,10 @@ class KanaTreeBuilder(val sokuon: String) : PrefixTree.BuilderBase<KanaTreeBuild
             mappings.addAll(addDoubleConsonants(mappings))
         }
 
+        if (KanaFlag.ADD_LONG_VOWEL in flags) {
+            mappings.addAll(addLongVowels(mappings))
+        }
+
         mappings.forEach { (s, e) -> put(s, e) }
         return this
     }
@@ -21,6 +26,16 @@ class KanaTreeBuilder(val sokuon: String) : PrefixTree.BuilderBase<KanaTreeBuild
         val additionalMappings = mutableListOf<KanaMapping>()
         for ((seq, el) in mappings) {
             additionalMappings.add(KanaMapping(seq[0] + seq, sokuon + el))
+        }
+        return additionalMappings
+    }
+
+    private fun addLongVowels(mappings: List<KanaMapping>): List<KanaMapping> {
+        requireNotNull(choonpu, { "ADD_LONG_VOWEL cannot be used without a choonpu" })
+
+        val additionalMappings = mutableListOf<KanaMapping>()
+        for ((seq, el) in mappings) {
+            additionalMappings.add(KanaMapping(seq + seq[seq.length - 1], el + choonpu!!))
         }
         return additionalMappings
     }
