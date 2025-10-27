@@ -22,18 +22,25 @@ class PrefixTreeTest {
 
     @Test
     fun `bad text`() {
-        val tree = PrefixTree.builder().apply {
-            put("a", "あ")
-            put("i", "い")
-            put("u", "う")
-            put("e", "え")
-            put("o", "お")
-        }.build()
+        val translator = Translator(
+            PrefixTree.builder().apply {
+                put("a", "あ")
+                put("i", "い")
+                put("u", "う")
+                put("e", "え")
+                put("o", "お")
+            }.build()
+        )
 
-        val ex: IllegalArgumentException = assertThrows<IllegalArgumentException> {
-            Translator(tree).translate("aeibadtext")
+        var ex: IllegalArgumentException = assertThrows<IllegalArgumentException> {
+            translator.translate("aeibadtext")
         }
         assertEquals(ex.message, "Invalid token at start=3 end=3. Input[start..end+4] = \"badt\"")
+
+        ex = assertThrows<IllegalArgumentException> {
+            translator.translate("aexx")
+        }
+        assertEquals(ex.message, "Invalid token at start=2 end=2. Input[start..end+4] = \"xx\"")
     }
 
     @Test
