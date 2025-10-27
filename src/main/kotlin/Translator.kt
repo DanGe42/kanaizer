@@ -36,21 +36,24 @@ class Translator(
     }
 
     private fun processNext(text: String, startIndex: Int): TranslateNextResult {
-        val nextChar = text[startIndex]
-        if (nextChar == disambiguator) {
-            return TranslateNextResult.Disambiguator(startIndex + 1)
-        }
+        when (val nextChar = text[startIndex]) {
+            disambiguator -> {
+                return TranslateNextResult.Disambiguator(startIndex + 1)
+            }
 
-        if (nextChar in validPunctuation) {
-            return TranslateNextResult.Punctuation(nextChar, startIndex + 1)
-        }
+            in validPunctuation -> {
+                return TranslateNextResult.Punctuation(nextChar, startIndex + 1)
+            }
 
-        val (elements, nextIndex) = prefixTree.getNext(text, startIndex)
-        if (elements.isEmpty()) {
-            return TranslateNextResult.Invalid(startIndex, nextIndex)
-        }
+            else -> {
+                val (elements, nextIndex) = prefixTree.getNext(text, startIndex)
+                if (elements.isEmpty()) {
+                    return TranslateNextResult.Invalid(startIndex, nextIndex)
+                }
 
-        return TranslateNextResult.Translated(elements, nextIndex)
+                return TranslateNextResult.Translated(elements, nextIndex)
+            }
+        }
     }
 }
 
