@@ -1,3 +1,4 @@
+import KanaFlag.ADD_DOUBLE_CONSONANT
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertContains
@@ -99,13 +100,13 @@ class PrefixTreeTest {
     @Test
     fun `doubled consonants`() {
         val tree = KanaTreeBuilder(sokuon = "っ").apply {
-            putDoubled("cho", "ちょ")
+            put("cho", "ちょ", ADD_DOUBLE_CONSONANT)
             put("da", "だ")
             put("i", "い")
             put("i", "い")
-            putDoubled("ki", "き")
-            putDoubled("ku", "く")
-            putDoubled("kyo", "きょ")
+            put("ki", "き", ADD_DOUBLE_CONSONANT)
+            put("ku", "く", ADD_DOUBLE_CONSONANT)
+            put("kyo", "きょ", ADD_DOUBLE_CONSONANT)
             put("ma", "ま")
             put("me", "め")
             put("n", "ん")
@@ -113,13 +114,13 @@ class PrefixTreeTest {
             put("ni", "に")
             put("no", "の")
             put("ra", "ら")
-            putDoubled("sa", "さ")
-            putDoubled("sha", "しゃ")
-            putDoubled("shi", "し")
+            put("sa", "さ", ADD_DOUBLE_CONSONANT)
+            put("sha", "しゃ", ADD_DOUBLE_CONSONANT)
+            put("shi", "し", ADD_DOUBLE_CONSONANT)
             put("su", "す")
-            putDoubled("ta", "た")
-            putDoubled("te", "て")
-            putDoubled("to", "と")
+            put("ta", "た", ADD_DOUBLE_CONSONANT)
+            put("te", "て", ADD_DOUBLE_CONSONANT)
+            put("to", "と", ADD_DOUBLE_CONSONANT)
             put("ya", "や")
         }.build()
 
