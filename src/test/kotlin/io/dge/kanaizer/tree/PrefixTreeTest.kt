@@ -1,10 +1,6 @@
 package io.dge.kanaizer.tree
 
 import io.dge.kanaizer.translator.Translator
-import io.dge.kanaizer.tree.HIRAGANA_MAPPINGS
-import io.dge.kanaizer.tree.KanaFlag
-import io.dge.kanaizer.tree.KanaTreeBuilder
-import io.dge.kanaizer.tree.PrefixTree
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertContains
@@ -20,23 +16,23 @@ class PrefixTreeTest {
             put("e", "え")
             put("o", "お")
         }.build()
+        val translator = Translator(tree)
 
         val text = "aeiou"
         val expected = "あえいおう"
-        assertEquals(expected, Translator(tree).translate(text))
+        assertEquals(expected, translator.translate(text))
     }
 
     @Test
     fun `bad text`() {
-        val translator = Translator(
-            PrefixTree.builder().apply {
-                put("a", "あ")
-                put("i", "い")
-                put("u", "う")
-                put("e", "え")
-                put("o", "お")
-            }.build()
-        )
+        val tree = PrefixTree.builder().apply {
+            put("a", "あ")
+            put("i", "い")
+            put("u", "う")
+            put("e", "え")
+            put("o", "お")
+        }.build()
+        val translator = Translator(tree)
 
         var ex: IllegalArgumentException = assertThrows<IllegalArgumentException> {
             translator.translate("aeibadtext")
@@ -58,10 +54,11 @@ class PrefixTreeTest {
             put("e", "え")
             put("o", "お")
         }.build()
+        val translator = Translator(tree)
 
         val text = ""
         val expected = ""
-        assertEquals(expected, Translator(tree).translate(text))
+        assertEquals(expected, translator.translate(text))
     }
 
     @Test
@@ -96,6 +93,7 @@ class PrefixTreeTest {
             put("su", "す")
             put("ta", "た")
         }.build()
+        val translator = Translator(tree)
 
         mapOf(
             "nandesuka" to "なんですか",
@@ -103,26 +101,20 @@ class PrefixTreeTest {
             "nomimasu" to "のみます",
             "kudasai" to "ください",
             "arimasen" to "ありません",
-        ).forEach { (text, expected) ->
-            val actual = Translator(tree).translate(text)
-            val message = "translate(\"$text\") -> \"$actual\", but it should be \"$expected\""
-            assertEquals(expected, actual, message)
-        }
+        ).forEach(verifyTranslations(translator))
     }
 
     @Test
     fun `ambiguous romaji`() {
-        val translator = Translator(
-            PrefixTree.builder().apply {
-                put("ni", "に")
-                put("gi", "ぎ")
-                put("ri", "り")
-                put("zu", "ず")
-                put("zu", "づ")
-                put("shi", "し")
-            }.build(),
-            showAmbiguity = true,
-        )
+        val tree = PrefixTree.builder().apply {
+            put("ni", "に")
+            put("gi", "ぎ")
+            put("ri", "り")
+            put("zu", "ず")
+            put("zu", "づ")
+            put("shi", "し")
+        }.build()
+        val translator = Translator(tree, showAmbiguity = true)
 
         val text = "nigirizushi"
         val expected = "にぎり[ず|づ]し"
@@ -155,41 +147,37 @@ class PrefixTreeTest {
             put("to", "と", KanaFlag.ADD_DOUBLE_CONSONANT)
             put("ya", "や")
         }.build()
+        val translator = Translator(tree)
 
         mapOf(
             "chottomattekudasai" to "ちょっとまってください",
             "yakkyokuniittekimasu" to "やっきょくにいってきます",
             "nennotame" to "ねんのため",
             "irasshaimashita" to "いらっしゃいました",
-        ).forEach { (text, expected) ->
-            val actual = Translator(tree).translate(text)
-            val message = "translate(\"$text\") -> \"$actual\", but it should be \"$expected\""
-            assertEquals(expected, actual, message)
-        }
+        ).forEach(verifyTranslations(translator))
     }
 
     @Test
     fun `katakana with long vowels`() {
-        val translator = Translator(
-            KanaTreeBuilder(sokuon = "ッ", choonpu = "ー").apply {
-                put("de", "デ", KanaFlag.ADD_LONG_VOWEL)
-                put("fu", "フ", KanaFlag.ADD_LONG_VOWEL)
-                put("i", "イ", KanaFlag.ADD_LONG_VOWEL)
-                put("ka", "カ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
-                put("ke", "ケ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
-                put("ma", "マ", KanaFlag.ADD_LONG_VOWEL)
-                put("na", "ナ", KanaFlag.ADD_LONG_VOWEL)
-                put("pa", "パ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
-                put("ra", "ラ", KanaFlag.ADD_LONG_VOWEL)
-                put("re", "レ", KanaFlag.ADD_LONG_VOWEL)
-                put("ri", "リ", KanaFlag.ADD_LONG_VOWEL)
-                put("sa", "サ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
-                put("su", "ス", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
-                put("to", "ト", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
-                put("za", "ザ", KanaFlag.ADD_LONG_VOWEL)
-                put("n", "ン")
-            }.build()
-        )
+        val tree = KanaTreeBuilder(sokuon = "ッ", choonpu = "ー").apply {
+            put("de", "デ", KanaFlag.ADD_LONG_VOWEL)
+            put("fu", "フ", KanaFlag.ADD_LONG_VOWEL)
+            put("i", "イ", KanaFlag.ADD_LONG_VOWEL)
+            put("ka", "カ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+            put("ke", "ケ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+            put("ma", "マ", KanaFlag.ADD_LONG_VOWEL)
+            put("na", "ナ", KanaFlag.ADD_LONG_VOWEL)
+            put("pa", "パ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+            put("ra", "ラ", KanaFlag.ADD_LONG_VOWEL)
+            put("re", "レ", KanaFlag.ADD_LONG_VOWEL)
+            put("ri", "リ", KanaFlag.ADD_LONG_VOWEL)
+            put("sa", "サ", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+            put("su", "ス", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+            put("to", "ト", KanaFlag.ADD_DOUBLE_CONSONANT, KanaFlag.ADD_LONG_VOWEL)
+            put("za", "ザ", KanaFlag.ADD_LONG_VOWEL)
+            put("n", "ン")
+        }.build()
+        val translator = Translator(tree)
 
         mapOf(
             "karee" to "カレー",
@@ -197,11 +185,7 @@ class PrefixTreeTest {
             "furiiransu" to "フリーランス",
             "suupaamaaketto" to "スーパーマーケット",
             "sakkaa" to "サッカー",
-        ).forEach { (text, expected) ->
-            val actual = translator.translate(text)
-            val message = "translate(\"$text\") -> \"$actual\", but it should be \"$expected\""
-            assertEquals(expected, actual, message)
-        }
+        ).forEach(verifyTranslations(translator))
     }
 
     // -- These tests use the full hiragana mappings -- //
@@ -216,7 +200,12 @@ class PrefixTreeTest {
             "nishukan'imasu." to "にしゅかんいます.",
             "nan nichi nihon ni imasu ka?" to "なん にち にほん に います か?",
             "sumimasen.  kyoto eki made ichi mai, onegai shimasu。" to "すみません.  きょと えき まで いち まい, おねがい します。"
-        ).forEach { (text, expected) ->
+        ).forEach(verifyTranslations(translator))
+    }
+
+    private fun verifyTranslations(translator: Translator): (Map.Entry<String, String>) -> Unit {
+        return fun(entry: Map.Entry<String, String>) {
+            val (text, expected) = entry
             val actual = translator.translate(text)
             val message = "translate(\"$text\") -> \"$actual\", but it should be \"$expected\""
             assertEquals(expected, actual, message)

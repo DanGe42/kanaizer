@@ -1,13 +1,40 @@
 package io.dge.kanaizer.tree
 
-open class PrefixTree private constructor(private val root: PrefixNode) {
+import io.dge.kanaizer.tree.PrefixTree.Companion.builder
+
+
+/**
+ * A [prefix tree](https://en.wikipedia.org/wiki/Trie).
+ *
+ * A [PrefixTree] cannot be directly constructed. It is intended to be built with a builder.
+ *
+ * See:
+ * - [builder], which constructs a [Builder], the most basic of PrefixTree builders.
+ * - [kanaBuilder], which constructs a [KanaTreeBuilder], a PrefixTree builder specialized for
+ *   Japanese kana.
+ *
+ * @see Builder
+ * @see KanaTreeBuilder
+ */
+class PrefixTree private constructor(private val root: PrefixNode) {
     companion object {
         fun builder(): Builder = Builder()
+    }
+
+    /** The most basic builder. */
+    class Builder : BuilderBase<Builder>() {
+        override fun self(): Builder = this
     }
 
     abstract class BuilderBase<B> {
         private val pairs = mutableListOf<Pair<String, String>>()
 
+        /**
+         * A necessary hack to make it possible to subclass builder classes.
+         * Callers simply need to override it as follows:
+         *
+         *     override fun self(): BuilderSubclassType = this
+         */
         abstract fun self(): B
 
         /**
@@ -15,9 +42,9 @@ open class PrefixTree private constructor(private val root: PrefixNode) {
          */
         fun put(sequence: String, element: String): B {
             if (sequence.isEmpty()) {
-                // This ensures the root element is always empty.
-                // This is useful because if getNext returns an empty list of elements, then it can indicate either the
-                // end of input or invalid input.
+                // Ensures that the root element is always empty.
+                // This is useful because if getNext returns an empty list of elements,
+                // then it can indicate either the end of input or invalid input.
                 throw IllegalArgumentException("Cannot put empty sequence into tree")
             }
             pairs.add(Pair(sequence, element))
@@ -31,11 +58,6 @@ open class PrefixTree private constructor(private val root: PrefixNode) {
             }
             return PrefixTree(root)
         }
-    }
-
-    /** The most basic builder. */
-    class Builder: BuilderBase<Builder>() {
-        override fun self(): Builder = this
     }
 
     /**
@@ -53,8 +75,17 @@ open class PrefixTree private constructor(private val root: PrefixNode) {
     }
 }
 
+/**
+ * A pair of elements and the next index ready to be consumed in a text.
+ * See [PrefixTree.getNext].
+ */
 data class Lookup(val elements: List<String>, val nextIndex: Int)
 
+/**
+ * Internal recursive data structure to represent each node of a [PrefixTree].
+ * Each node stores a list of elements and a mapping of the next characters to
+ * their respective nodes.
+ */
 internal class PrefixNode(private val _elements: MutableList<String>) {
     constructor() : this(mutableListOf<String>())
 
@@ -69,24 +100,24 @@ internal class PrefixNode(private val _elements: MutableList<String>) {
 
         val nextChar: Char = sequence.first()
         val remaining: String = sequence.substring(1)
-        val nextNode = prefixes.computeIfAbsent(nextChar, { PrefixNode() })
+        val nextNode = prefixes.computeIfAbsent(nextChar) { PrefixNode() }
         nextNode.put(remaining, element)
     }
 
     fun getNext(text: String, startIndex: Int): Lookup {
-        // First base case: you're at (or past) the end of the string
-        if (startIndex >= text.length) {
-            return Lookup(elements, startIndex)
+        if (startIndex < text.length) {
+            val nextChar: Char = text[startIndex]
+            val nextNode = prefixes[nextChar]
+
+            // Greedily extend our prefix if we have a match
+            if (nextNode != null) {
+                return nextNode.getNext(text, startIndex + 1)
+            }
         }
 
-        val nextChar: Char = text[startIndex]
-        val nextNode = prefixes[nextChar]
-
-        // Second base case: you cannot move on from this node, so this becomes the terminal node
-        if (nextNode == null) {
-            return Lookup(elements, startIndex)
-        }
-
-        return nextNode.getNext(text, startIndex + 1)
+        // Base cases:
+        // 1. We're at or past the end of the string
+        // 2. We cannot move on from this node, so this becomes the terminal node.
+        return Lookup(elements, startIndex)
     }
 }
