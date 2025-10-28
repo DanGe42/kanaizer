@@ -6,7 +6,8 @@ import kotlin.math.min
 class Translator(
     val prefixTree: PrefixTree,
     val disambiguator: Char = '\'',
-    val validPunctuation: String = " ,.-。?"
+    val validPunctuation: String = " ,.-。?",
+    val showAmbiguity: Boolean = false,
 ) {
     fun translate(text: String): String {
         var startIndex = 0
@@ -22,7 +23,11 @@ class Translator(
                 }
 
                 is TranslateNextResult.Translated -> {
-                    translated.append(result.elements.first())
+                    if (showAmbiguity && result.elements.size > 1) {
+                        translated.append("[${result.elements.joinToString("|")}]")
+                    } else {
+                        translated.append(result.elements.first())
+                    }
                     startIndex = result.nextIndex
                 }
 

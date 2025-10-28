@@ -111,6 +111,25 @@ class PrefixTreeTest {
     }
 
     @Test
+    fun `ambiguous romaji`() {
+        val translator = Translator(
+            PrefixTree.builder().apply {
+                put("ni", "に")
+                put("gi", "ぎ")
+                put("ri", "り")
+                put("zu", "ず")
+                put("zu", "づ")
+                put("shi", "し")
+            }.build(),
+            showAmbiguity = true,
+        )
+
+        val text = "nigirizushi"
+        val expected = "にぎり[ず|づ]し"
+        assertEquals(expected, translator.translate(text))
+    }
+
+    @Test
     fun `doubled consonants`() {
         val tree = KanaTreeBuilder(sokuon = "っ").apply {
             put("cho", "ちょ", KanaFlag.ADD_DOUBLE_CONSONANT)
